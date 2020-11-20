@@ -1,12 +1,13 @@
 from collections import deque
-from rock_paper_scissors import rules, Game
+from rock_paper_scissors import Game
 
 
 def test_rules():
-    assert rules("r", "p") == "2"
-    assert rules("p", "r") == "1"
-    assert rules("s", "p") == "1"
-    assert rules("p", "p") == "X"
+    g = Game()
+    assert g.rules("r", "p") == "2"
+    assert g.rules("p", "r") == "1"
+    assert g.rules("s", "p") == "1"
+    assert g.rules("p", "p") == "X"
 
 
 def test_beat_last():

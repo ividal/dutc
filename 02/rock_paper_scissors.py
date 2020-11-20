@@ -38,45 +38,31 @@ class Game:
         self.histories[1].appendleft(challenger_shape)
         return player_shape, challenger_shape
 
+    def rules(self, a: str, b: str) -> str:
+        """
+            Returns who wins, given shapes played by two players a and b
+            a: Player
+            b: Challenger
+            Returns one of:
+                "1": Player wins
+                "X": Tie
+                "2": Challenger wins
+        """
 
-# NOTE: for naming & design purposes, you may assume the players are directional
-#       i.e., `a` is the Player
-#             `b` is the Challenger
-#       e.g., `rules` could return "player wins" or "player loses"
-#              or it could "player wins" vs "challenger wins"
-# QUESTION: how do you represent ties?
-def rules(a: str, b: str) -> str:
-    """
-    Returns who wins, given shapes played by two players a and b
-    a: Player
-    b: Challenger
-    Returns oneof:
-        "1": Player wins
-        "X": Tie
-        "2": Challenger wins
-    """
+        if (a not in ["r", "p", "s"] or
+                b not in ["r", "p", "s"]):
+            return None
 
-    if (a not in ["r", "p", "s"] or
-            b not in ["r", "p", "s"]):
-        return None
+        if a == b:
+            return "X"
 
-    if a == b:
-        return "X"
-
-    if a == "r":
-        result = "1" if (b == "s") else "2"
-        return result
-    if a == "p":
-        result = "1" if (b == "r") else "2"
-        return result
-    if a == "s":
-        result = "1" if (b == "p") else "2"
+        result = "2" if b == self.what_beats_key[a] else "1"
         return result
 
 
 g = Game()
 
 games = [g.show_hands(g.random_strategy(), g.beat_previous_play(1)) for _ in range(10_000)]
-results = [rules(a, b) for a, b in games]
+results = [g.rules(a, b) for a, b in games]
 ranking = Counter(results)
 print(f"{ranking =}")
