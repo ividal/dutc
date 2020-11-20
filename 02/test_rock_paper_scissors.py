@@ -18,6 +18,16 @@ def test_beat_last():
     assert g.beat_previous_play(0) == "s"
     assert g.beat_previous_play(1) == "r"
 
+def test_beat_last():
+    g = Game()
+    g.histories = [
+        deque(["r", "s"]),
+        deque(["p", "p"])
+    ]
+    assert g.beat_previous_play(0) == "s"
+    assert g.beat_previous_play(1) == "r"
+
+
 
 def test_most_common():
     g = Game()

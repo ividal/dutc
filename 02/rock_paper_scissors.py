@@ -7,8 +7,8 @@ class Game:
     def __init__(self, memory=5):
         # fifo, most recent to the left
         self.histories = [
-            deque([None], maxlen=memory),
-            deque([None], maxlen=memory)
+            deque([], maxlen=memory),
+            deque([], maxlen=memory)
         ]
         self.what_beats_key = {"r": "p", "s": "r", "p": "s"}
 
@@ -21,6 +21,8 @@ class Game:
     def beat_previous_play(self, player_id):
         """ select the shape that would beat the opponent's previous play """
         opponents_history = self.histories[not player_id]
+        if len(opponents_history) < 1:
+            return self.random_strategy(player_id)
         winning_shape = self.what_beats_key[opponents_history[0]]
         self.histories[player_id].appendleft(winning_shape)
         return winning_shape
@@ -29,11 +31,12 @@ class Game:
         """ select the most common shape from the opponent's previous N plays """
         opponents_history = self.histories[not player_id]
         limit = min(n, len(opponents_history))
-        opponents_recent_history = opponents_history[:limit]
+        opponents_recent_history = list(opponents_history)[:limit]
         counts = Counter(opponents_recent_history)
         shape = counts.most_common()[0][0]
         self.histories[player_id].appendleft(shape)
         return shape
+
 
 
 # NOTE: for naming & design purposes, you may assume the players are directional
@@ -73,6 +76,7 @@ def rules(a: str, b: str) -> str:
 
 g = Game()
 
-games = [(g.random_strategy(0), g.random_strategy(1)) for _ in range(10_000)]
+games = [(g.random_strategy(0), g.beat_previous_play(1)) for _ in range(10_000)]
 results = [rules(a, b) for a, b in games]
-print(results)
+ranking = Counter(results)
+print(f"{ranking =}")
