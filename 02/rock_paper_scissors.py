@@ -12,19 +12,12 @@ class Game:
         ]
         self.what_beats_key = {"r": "p", "s": "r", "p": "s"}
 
-    def random_strategy(self, player_id):
-        """ randomly select a shape """
-        shape = choice(["r", "p", "s"])
-        self.histories[player_id].appendleft(shape)
-        return shape
-
     def beat_previous_play(self, player_id):
         """ select the shape that would beat the opponent's previous play """
         opponents_history = self.histories[not player_id]
         if len(opponents_history) < 1:
-            return self.random_strategy(player_id)
+            return self.random_strategy()
         winning_shape = self.what_beats_key[opponents_history[0]]
-        self.histories[player_id].appendleft(winning_shape)
         return winning_shape
 
     def most_common_play(self, player_id, n=3):
@@ -34,9 +27,16 @@ class Game:
         opponents_recent_history = list(opponents_history)[:limit]
         counts = Counter(opponents_recent_history)
         shape = counts.most_common()[0][0]
-        self.histories[player_id].appendleft(shape)
         return shape
 
+    def random_strategy(self):
+        """ randomly select a shape """
+        return choice(["r", "p", "s"])
+
+    def show_hands(self, player_shape, challenger_shape):
+        self.histories[0].appendleft(player_shape)
+        self.histories[1].appendleft(challenger_shape)
+        return player_shape, challenger_shape
 
 
 # NOTE: for naming & design purposes, you may assume the players are directional
@@ -76,7 +76,7 @@ def rules(a: str, b: str) -> str:
 
 g = Game()
 
-games = [(g.random_strategy(0), g.beat_previous_play(1)) for _ in range(10_000)]
+games = [g.show_hands(g.random_strategy(), g.beat_previous_play(1)) for _ in range(10_000)]
 results = [rules(a, b) for a, b in games]
 ranking = Counter(results)
 print(f"{ranking =}")
