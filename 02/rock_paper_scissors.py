@@ -2,6 +2,40 @@ from random import choice
 from collections import Counter, deque
 
 
+class Game:
+
+    def __init__(self, memory=5):
+        # fifo, most recent to the left
+        self.histories = [
+            deque([None], maxlen=memory),
+            deque([None], maxlen=memory)
+        ]
+        self.what_beats_key = {"r": "p", "s": "r", "p": "s"}
+
+    def random_strategy(self, player_id):
+        """ randomly select a shape """
+        shape = choice(["r", "p", "s"])
+        self.histories[player_id].appendleft(shape)
+        return shape
+
+    def beat_previous_play(self, player_id):
+        """ select the shape that would beat the opponent's previous play """
+        opponents_history = self.histories[not player_id]
+        winning_shape = self.what_beats_key[opponents_history[0]]
+        self.histories[player_id].appendleft(winning_shape)
+        return winning_shape
+
+    def most_common_play(self, player_id, n=3):
+        """ select the most common shape from the opponent's previous N plays """
+        opponents_history = self.histories[not player_id]
+        limit = min(n, len(opponents_history))
+        opponents_recent_history = opponents_history[:limit]
+        counts = Counter(opponents_recent_history)
+        shape = counts.most_common()[0][0]
+        self.histories[player_id].appendleft(shape)
+        return shape
+
+
 # NOTE: for naming & design purposes, you may assume the players are directional
 #       i.e., `a` is the Player
 #             `b` is the Challenger
@@ -19,8 +53,8 @@ def rules(a: str, b: str) -> str:
         "2": Challenger wins
     """
 
-    if a not in ["r", "p", "s"] or \
-            b not in ["r", "p", "s"]:
+    if (a not in ["r", "p", "s"] or
+            b not in ["r", "p", "s"]):
         return None
 
     if a == b:
@@ -37,23 +71,8 @@ def rules(a: str, b: str) -> str:
         return result
 
 
-def random_strategy():
-    """ randomly select a shape """
-    return choice(['rps'])
+g = Game()
 
-
-# other sample strategies…
-
-# QUESTION: how do we track "history" here?
-def beat_previous_play():
-    """ select the shape that would beat the opponent's previous play """
-    pass
-
-
-def most_common_play(n=3):
-    ''' select the most common shape from the opponent's previous N plays '''
-    pass
-
-
-games = [(random_strategy(), random_strategy()) for _ in range(10_000)]
+games = [(g.random_strategy(0), g.random_strategy(1)) for _ in range(10_000)]
 results = [rules(a, b) for a, b in games]
+print(results)
