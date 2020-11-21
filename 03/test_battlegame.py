@@ -15,10 +15,10 @@ test_state_board = np.array([
     [0, 0, -1, 0]], dtype=int)
 
 
-def test_init_linear():
+def test_init_linear_no_space():
     ref = np.array([
-        [1, 1, 1, 1],
-        [1, 1, 0, 0],
+        [2, 2, 0 , 0],
+        [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0]], dtype=int)
 
@@ -28,6 +28,19 @@ def test_init_linear():
     assert ref.shape == g.ships[0].shape
     assert (ref == g.ships[0]).all()
 
+def test_init_linear():
+    ref = np.array([
+        [1, 1, 1, 1, 1],
+        [2, 2, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]], dtype=int)
+
+    g = Battlegame(5)
+
+    assert isinstance(g.ships[0], np.ndarray)
+    assert ref.shape == g.ships[0].shape
+    assert (ref == g.ships[0]).all()
 
 def test_fire():
     g = Battlegame(4)

@@ -63,9 +63,8 @@ class Battlegame:
                 if placed:
                     break
                 if valid_starting_block(row[c:], blocks):
-                    continue
-                row[c:c + blocks] = ship_id
-                placed = True
+                    row[c:c + blocks] = ship_id
+                    placed = True
 
         return placed, board
 
@@ -143,9 +142,11 @@ class Battlegame:
 
 
 def valid_starting_block(slice: np.array, blocks: int) -> bool:
-    print(f'{len(slice)=}, {blocks}')
     if not (any(slice[:blocks] > 0) or blocks > len(slice)):
         return True
+
+    return False
+
 
 
 def random_strategy(board_size=10):
@@ -158,4 +159,3 @@ def linear_strategy(board_size=10):
     targets = [*product(range(board_size), range(board_size))]
     targets.reverse()
     yield from targets
-
