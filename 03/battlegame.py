@@ -43,18 +43,23 @@ class Battlegame:
         self.placing_strategies = (ships_A_strategy, ships_B_strategy)
 
         # >=1: has part of a ship, 0: doesn't, -1: block was hit
-        ships_A = self.placing_strategies[0](allowed_pieces)
-        ships_B = self.placing_strategies[1](allowed_pieces)
-        self.ships = (ships_A, ships_B)
-        [print(b) for b in self.ships]
+        ships_A, lives_A = self.placing_strategies[0](allowed_pieces)
+        ships_B, lives_B = self.placing_strategies[1](allowed_pieces)
+        self.ship_boards = (ships_A, ships_B)
+        print(f"{lives_A =}")
+
+        self.lives = (lives_A, lives_B)
+        [print(b) for b in self.ship_boards]
+        print(f"{self.lives =}")
 
         # 0: never fired, 1: hit, -1: missed
         state_A = np.zeros((self.size, self.size), dtype=int)
         state_B = np.zeros((self.size, self.size), dtype=int)
         self.states = (state_A, state_B)
 
-    def find_row(self, board, blocks, ship_id=1):
+    def find_row(self, board:np.array, blocks:int, ship_id:int, lives: dict):
         placed = False
+        lives[ship_id] = 0
         for r in range(board.shape[0]):
             if placed:
                 break
@@ -64,30 +69,34 @@ class Battlegame:
                     break
                 if valid_starting_block(row[c:], blocks):
                     row[c:c + blocks] = ship_id
+                    lives[ship_id] = blocks
                     placed = True
 
-        return placed, board
+        return placed, board, lives
 
     def fill_linear(self, pieces: tuple[str]) -> np.array:
         board = np.zeros((self.size, self.size), dtype=int)
+        lives = {}
         for i, p in enumerate(pieces):
             ship_id = i + 1  # we don't want 0-indexed ids
             blocks = self.ship_sizes[p]
-            placed, board = self.find_row(board, blocks, ship_id=ship_id)
-            print(f"Lin Placing #{ship_id}: {p}, {blocks} blocks")
+            placed, board, lives = self.find_row(board, blocks, ship_id=ship_id, lives=lives)
 
             if not placed:
                 board_t = np.transpose(board)
-                _, board_t = self.find_row(board_t, blocks, ship_id=ship_id)
+                placed, board_t, lives = self.find_row(board_t, blocks, ship_id=ship_id, lives=lives)
                 board = np.transpose(board_t)
 
-        return board
+        print(f"{lives=}")
+        return board, lives
 
     def fill_randomly(self, pieces: tuple[str]) -> np.array:
         board = np.zeros((self.size, self.size), dtype=int)
+        lives = {}
         coords = random_strategy(self.size)
         for i, p in enumerate(pieces):
             ship_id = i + 1  # we don't want 0-indexed ids
+            lives[ship_id] = 0
             placed = False
             blocks = self.ship_sizes[p]
 
@@ -98,14 +107,15 @@ class Battlegame:
                 if valid_starting_block(row[c:], blocks):
                     row[c:c + blocks] = ship_id
                     placed = True
-                    continue
                 else:
                     col = board[:, c]
                     if valid_starting_block(col[r:], blocks):
                         col[r:r+blocks] = ship_id
                         placed = True
-                        continue
-        return board
+        if placed:
+            lives[ship_id] = blocks
+
+        return board, lives
 
     def play_round(self):
         id = next(self.players_cycle)
@@ -123,11 +133,16 @@ class Battlegame:
 
     def fire(self, target_id, coordinates):
         hit = False
-        if self.ships[target_id][coordinates]:
+        if self.ship_boards[target_id][coordinates]:
             hit = True
             self.states[target_id][coordinates] = 1
-            self.ships[target_id][coordinates] = -1
+            ship_id = self.ship_boards[target_id][coordinates]
+            self.ship_boards[target_id][coordinates] = -1
+            ship_life = self.lives[target_id][ship_id]
+            self.lives[target_id][ship_id] = ship_life - 1
             print(f"Target Player {target_id}, {coordinates} was a HIT!")
+            if self.lives[target_id][ship_id] == 0:
+                print(f"Player {target_id}'s ship is sunk!")
         else:
             self.states[target_id][coordinates] = -1
             print(f"Target Player {target_id}, {coordinates} was a MISS!")
@@ -135,7 +150,9 @@ class Battlegame:
 
     def check_lost(self, target_id) -> bool:
         lost = False
-        if not (self.ships[target_id] > 0).any():
+        print(self.lives[target_id])
+        #if not (self.ship_boards[target_id] > 0).any():
+        if all(life == 0 for life in self.lives[target_id].values()):
             lost = True
             print(f"Player {target_id} lost!")
         return lost

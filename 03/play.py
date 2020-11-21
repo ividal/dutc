@@ -7,7 +7,7 @@ if __name__ == "__main__":
     strategy_B = random_strategy(board_size)
 
     g = Battlegame(board_size, (strategy_A, strategy_B),
-                   allowed_pieces=("carrier", "destroyer", "destroyer"),#, "carrier"),
+                   allowed_pieces=("carrier", "destroyer", "destroyer", "carrier"),
                    fill_strategies=("linear", "linear"))
 
     ended = False
