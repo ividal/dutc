@@ -15,7 +15,7 @@ test_state_board = np.array([
     [0, 0, -1, 0]], dtype=int)
 
 
-def test_fill_left():
+def test_init():
     ref = np.array([
         [1, 1, 1, 1],
         [1, 1, 0, 0],
