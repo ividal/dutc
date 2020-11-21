@@ -52,3 +52,4 @@ def test_fire():
         [0, 0, -1, -1],
         [0, 0, 0, 0],
         [0, 0, 0, 0]], dtype=bool)).all()
+    assert g.check_lost(0)

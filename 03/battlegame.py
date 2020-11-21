@@ -62,7 +62,7 @@ class Battlegame:
         coords = self.choose_next_target()
         result = self.fire(target_id, coords)
 
-        return result, self.check_end(target_id)
+        return result, self.check_lost(target_id)
 
     def fire(self, target_id, coordinates):
         hit = False
@@ -76,9 +76,9 @@ class Battlegame:
             print(f"Target Player {target_id}, {coordinates} was a MISS!")
         return hit
 
-    def check_end(self, target_id) -> bool:
+    def check_lost(self, target_id) -> bool:
         lost = False
-        if (self.states[target_id] == 1).all():
+        if (self.ships[target_id] == 0).all():
             lost = True
         return lost
 
