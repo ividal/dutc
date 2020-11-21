@@ -87,7 +87,6 @@ class Battlegame:
                 placed, board_t, lives = self.find_row(board_t, blocks, ship_id=ship_id, lives=lives)
                 board = np.transpose(board_t)
 
-        print(f"{lives=}")
         return board, lives
 
     def fill_randomly(self, pieces: tuple[str]) -> np.array:
@@ -151,7 +150,6 @@ class Battlegame:
     def check_lost(self, target_id) -> bool:
         lost = False
         print(self.lives[target_id])
-        #if not (self.ship_boards[target_id] > 0).any():
         if all(life == 0 for life in self.lives[target_id].values()):
             lost = True
             print(f"Player {target_id} lost!")
