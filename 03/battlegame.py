@@ -40,7 +40,7 @@ class Battlegame:
 
     # zero_els = np.count_nonzero(row[start:])
     def fill_left(self, pieces: list) -> np.array:
-        board = np.zeros((self.size, self.size), dtype=bool)
+        board = np.zeros((self.size, self.size), dtype=int)
         for p in pieces:
             placed = False
             blocks = self.ship_sizes[p]
@@ -51,7 +51,7 @@ class Battlegame:
                     break
                 if any(row[start:end]):
                     continue
-                row[start:end] = True
+                row[start:end] = 1
                 placed = True
                 continue
         return board
@@ -69,7 +69,7 @@ class Battlegame:
         if self.ships[target_id][coordinates]:
             hit = True
             self.states[target_id][coordinates] = 1
-            self.ships[target_id][coordinates] = False
+            self.ships[target_id][coordinates] = -1
             print(f"Target Player {target_id}, {coordinates} was a HIT!")
         else:
             self.states[target_id][coordinates] = -1
@@ -78,7 +78,7 @@ class Battlegame:
 
     def check_lost(self, target_id) -> bool:
         lost = False
-        if (self.ships[target_id] == 0).all():
+        if not (self.ships[target_id] == 1).any():
             lost = True
         return lost
 

@@ -6,13 +6,13 @@ test_ship_board = np.array([
     [0, -1, -1, -1],
     [0, 0, 1, -1],
     [0, 0, 0, 0],
-    [0, 0, 0, 0]], dtype=bool)
+    [0, 0, 0, 0]], dtype=int)
 
 test_state_board = np.array([
     [0, 1, 1, 1],
     [0, 0, 0, 1],
     [0, 0, 0, 0],
-    [0, 0, -1, 0]], dtype=bool)
+    [0, 0, -1, 0]], dtype=int)
 
 
 def test_fill_left():
@@ -20,7 +20,7 @@ def test_fill_left():
         [1, 1, 1, 1],
         [1, 1, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 0]], dtype=bool)
+        [0, 0, 0, 0]], dtype=int)
 
     g = Battlegame(4)
 
@@ -39,11 +39,11 @@ def test_fire():
         [0, -1, -1, -1],
         [0, 0, -1, -1],
         [0, 0, 0, 0],
-        [0, 0, 0, 0]], dtype=bool)).all()
+        [0, 0, 0, 0]], dtype=int)).all()
 
     assert (g.states[0] == np.array([
         [0, 1, 1, 1],
         [0, 0, 1, 1],
         [0, 0, 0, 0],
-        [0, 0, -1, 0]], dtype=bool)).all()
+        [0, 0, -1, 0]], dtype=int)).all()
     assert g.check_lost(0)
