@@ -1,5 +1,7 @@
 import numpy as np
 from itertools import cycle
+from itertools import product
+from random import shuffle
 
 
 class Battlegame:
@@ -22,10 +24,13 @@ class Battlegame:
         "destroyer": 2,
     }
 
-    def __init__(self, size):
+    def __init__(self, size: int, strategies: tuple=None):
         self.size = size
         self.players = [0, 1]
         self.players_cycle = cycle(self.players)
+        if not strategies:
+            strategies = self.fixed_target()
+        self.strategies = strategies
 
         # 1: has ship block, 0: doesn't
         ships_A = self.fill_left(["carrier", "destroyer"])
@@ -38,7 +43,6 @@ class Battlegame:
         state_B = np.zeros((self.size, self.size), dtype=int)
         self.states = (state_A, state_B)
 
-    # zero_els = np.count_nonzero(row[start:])
     def fill_left(self, pieces: list) -> np.array:
         board = np.zeros((self.size, self.size), dtype=int)
         for p in pieces:
@@ -59,10 +63,13 @@ class Battlegame:
     def play_round(self):
         id = next(self.players_cycle)
         target_id = (id + 1) % len(self.players)
-        coords = self.choose_next_target()
+        coords = self.choose_next_target(id)
         result = self.fire(target_id, coords)
 
         return result, self.check_lost(target_id)
+
+    def choose_next_target(self, player_id):
+        return next(self.strategies[player_id])
 
     def fire(self, target_id, coordinates):
         hit = False
@@ -82,18 +89,26 @@ class Battlegame:
             lost = True
         return lost
 
-    def choose_next_target(self) -> tuple:
-        return (1, 1)
+    def fixed_target(self) -> tuple:
+        yield (1, 1)
+
+
+def random_strategy(board_size=10):
+    targets = [*product(range(board_size), range(board_size))]
+    shuffle(targets)
+    while True:
+        yield targets.pop()
 
 
 if __name__ == "__main__":
-    size = 4
-    g = Battlegame(size)
+    board_size = 4
+    strategy_A = random_strategy(board_size)
+    strategy_B = random_strategy(board_size)
 
-    print(g.ships[0][1, 0])
+    g = Battlegame(board_size, (strategy_A, strategy_B))
 
-    # handles for the players
     rounds = 6
+    #ended = False
     for r in range(rounds):
         result, ended = g.play_round()
         print(result)
