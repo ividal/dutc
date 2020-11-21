@@ -1,4 +1,4 @@
-from battlegame import Battlegame
+from battlegame import Battlegame, valid_starting_block
 
 import numpy as np
 
@@ -15,7 +15,7 @@ test_state_board = np.array([
     [0, 0, -1, 0]], dtype=int)
 
 
-def test_init():
+def test_init_linear():
     ref = np.array([
         [1, 1, 1, 1],
         [1, 1, 0, 0],
@@ -47,3 +47,18 @@ def test_fire():
         [0, 0, 0, 0],
         [0, 0, -1, 0]], dtype=int)).all()
     assert g.check_lost(0)
+
+def test_valid_starting_block():
+    blocks = 5
+
+    sliceA = np.array([0,0,1,0,0])
+    assert not valid_starting_block(sliceA, blocks)
+
+    sliceB = np.array([0,0,0,0])
+    assert not valid_starting_block(sliceB, blocks)
+
+    sliceC = np.array([0,0,0,3,0])
+    assert not valid_starting_block(sliceC, blocks)
+
+    sliceD = np.array([0,0,0,0,0])
+    assert valid_starting_block(sliceD, blocks)
