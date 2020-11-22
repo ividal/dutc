@@ -58,13 +58,14 @@ def search(pattern, *, max_value=100_000) -> int:
         subsequence = sequence[pos:]
         matches = [match_element(p, s) for p, s in zip(pattern, subsequence) ]
         if all(matches):
-            return pos
+            return pos, fizzbuzz_string
 
-    return None
+    return None, None
 
 
 # look for four sequential plays that are
 #   fizz, then fizz OR buzz, then anything, then buzz
 pattern = ['fizz', 'fizz|buzz', '*', 'fizzbuzz']
+pos, fizzbuzz = search(pattern, max_value=15)
 
-search(pattern, max_value=15)
+print(f"Found {pattern=} \n\ton 0-indexed {pos=} \n\tof {fizzbuzz=}")

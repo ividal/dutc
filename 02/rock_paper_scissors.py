@@ -65,4 +65,5 @@ g = Game()
 games = [g.show_hands(g.random_strategy(), g.beat_previous_play(1)) for _ in range(10_000)]
 results = [g.rules(a, b) for a, b in games]
 ranking = Counter(results)
-print(f"{ranking =}")
+print("1: Player 1 wins, X: tie, 2: Player 2 wins.")
+print(f"{ranking= }")
