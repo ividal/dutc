@@ -1,7 +1,8 @@
-# dutc
-dutc warm up exercises
+# DUTC
 
-## Sample usage, per day
+DUTC course warm-up exercises
+
+## Sample usage
 
 Day01:
 ```
